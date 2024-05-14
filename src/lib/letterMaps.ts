@@ -1,4 +1,4 @@
-const letters = [
+export const letters = [
   'a',
   'b',
   'c',
@@ -28,6 +28,7 @@ const letters = [
 ]
 
 type LetterMap = { [key: string]: string }
+type LetterCount = { [key: string]: number }
 
 export const createLetterMap = () => {
   const realLetters = [...letters]
@@ -47,6 +48,13 @@ export const createEmptyLetterMap = () => {
   for (const l of letters) {
     resultingMap[l] = ''
   }
+  return resultingMap
+}
 
+export const createEmptyLetterCount = () => {
+  const resultingMap: LetterCount = {}
+  for (const l of letters) {
+    resultingMap[l] = 0
+  }
   return resultingMap
 }
