@@ -27,8 +27,8 @@ export const letters = [
   'z'
 ]
 
-type LetterMap = { [key: string]: string }
-type LetterCount = { [key: string]: number }
+export type LetterMap = { [key: string]: string }
+export type LetterCount = { [key: string]: number }
 
 export const createLetterMap = () => {
   const realLetters = [...letters]

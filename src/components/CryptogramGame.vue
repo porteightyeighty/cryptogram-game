@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div id="puzzle" class="flex space-x-2">
+  <div class="w-fit">
+    <div id="puzzle" class="flex space-x-2 flex-wrap">
       <LetterTile
         @change-guess="handleChangeGuess"
         v-for="n in answer.length"
@@ -10,25 +10,37 @@
         :guess="guessKey[answerKey[answer[n - 1]]]"
       />
     </div>
-
-    <div
-      id="letterbox"
-      class="w-60 flex flex-wrap justify-center border-2 border-border bg-background"
-    >
+    <div class="flex justify-center pt-4">
       <div
-        v-for="(value, key) in guessKey"
-        :key="key"
-        class="p-2"
-        :class="
-          guessCount[key as string] > 1
-            ? 'text-error font-bold underline'
-            : guessCount[key as string] > 0
-              ? 'text-copy'
-              : 'text-primary'
-        "
+        id="letterbox"
+        class="w-60 flex flex-wrap justify-center border-2 border-border bg-background"
       >
-        {{ key }}
+        <div
+          v-for="(value, key) in guessKey"
+          :key="key"
+          class="p-2"
+          :class="
+            guessCount[key as string] > 1
+              ? 'text-error font-bold underline'
+              : guessCount[key as string] > 0
+                ? 'text-copy'
+                : 'text-primary'
+          "
+        >
+          {{ key }}
+        </div>
       </div>
+    </div>
+    <div class="w-full flex justify-center pt-4">
+      <button
+        v-if="!correct"
+        @click="handleSubmit"
+        class="w-fit px-2 py-1 border border-primary disabled:bg-background disabled:border-border"
+        :disabled="!submittable"
+      >
+        Submit
+      </button>
+      <div v-else class="w-fit px-2 py-1 border border-success">Correct!</div>
     </div>
   </div>
 </template>
@@ -40,9 +52,10 @@ import {
   createLetterMap,
   createEmptyLetterMap,
   createEmptyLetterCount,
-  letters
+  letters,
+  type LetterMap
 } from '../lib/letterMaps'
-defineProps<{
+const props = defineProps<{
   answer: string
 }>()
 
@@ -50,8 +63,45 @@ const isCharacterAlphabetical = (char: string) => {
   return letters.findIndex((letter) => letter === char) > -1
 }
 
-const answerKey = createLetterMap()
-const guessKey = ref(createEmptyLetterMap())
+const lettersInAnswer = computed(() => {
+  let lettersInAnswer: string[] = []
+  for (let i = 0; i < props.answer.length; i++) {
+    if (
+      isCharacterAlphabetical(props.answer[i]) &&
+      lettersInAnswer.findIndex((letter) => letter === props.answer[i]) === -1
+    ) {
+      lettersInAnswer.push(props.answer[i])
+    }
+  }
+  return lettersInAnswer
+})
+
+const answerKey: LetterMap = createLetterMap()
+const guessKey = ref<LetterMap>(createEmptyLetterMap())
+const submittable = computed(() => {
+  let lettersGuessed = 0
+  for (const key in guessKey.value) {
+    if (guessKey.value[key] !== '') {
+      lettersGuessed++
+    }
+  }
+  if (lettersGuessed === lettersInAnswer.value.length) return true
+  return false
+})
+
+const correct = ref<boolean>(false)
+
+const handleSubmit = () => {
+  for (const letter of lettersInAnswer.value) {
+    console.log(guessKey.value[answerKey[letter]])
+    if (guessKey.value[answerKey[letter]] !== letter) {
+      correct.value = false
+      return
+    }
+  }
+  correct.value = true
+  return
+}
 
 const guessCount = computed(() => {
   const guessCount = createEmptyLetterCount()
@@ -63,7 +113,7 @@ const guessCount = computed(() => {
   return guessCount
 })
 const handleChangeGuess = ([clue, data]) => {
-  guessKey.value[clue] = data ?? ''
+  guessKey.value = { ...guessKey.value, [clue]: data ?? '' }
 }
 // const lettersRemaining = ref({
 //   A: true,
