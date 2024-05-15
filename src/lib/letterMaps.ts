@@ -35,10 +35,15 @@ export const createLetterMap = () => {
   const encodedLetters = [...letters]
   const resultingMap: LetterMap = {}
   for (let i = 0; i < realLetters.length; i++) {
-    const randomNum = Math.floor(Math.random() * (26 - i))
+    resultingMap[realLetters[i]] = ''
+    while (resultingMap[realLetters[i]] === '') {
+      const randomNum = Math.floor(Math.random() * (26 - i))
+      if (realLetters[i] !== encodedLetters[randomNum]) {
+        resultingMap[realLetters[i]] = encodedLetters[randomNum]
 
-    resultingMap[realLetters[i]] = encodedLetters[randomNum]
-    encodedLetters.splice(randomNum, 1)
+        encodedLetters.splice(randomNum, 1)
+      }
+    }
   }
   return resultingMap
 }

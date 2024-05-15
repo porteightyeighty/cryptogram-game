@@ -3,5 +3,5 @@ import CryptogramGame from './components/CryptogramGame.vue'
 </script>
 
 <template>
-  <main><CryptogramGame :answer="`hello, there`" /></main>
+  <main><CryptogramGame :answer="`abcdefghijklmnopqrstuvwxyz`" /></main>
 </template>
